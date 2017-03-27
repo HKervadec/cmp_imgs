@@ -12,16 +12,21 @@ from pprint import PrettyPrinter
 def rgb2gray(img):
 	return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
-def resize(img, shape=(64,64)):
-	resized = np.ndarray(shape)
-	for (i,j),_ in np.ndenumerate(resized):
-		f1 = img.shape[0] // shape[0]
-		f2 = img.shape[1] // shape[1]
+def resize(img, size=(64,64)):
+	X = img.shape[0]
+	dx = size[0] - (X % size[0]) if (X % size[0]) != 0 else 0
 
-		slisse =  img[i*f1:(i+1)*f1,j*f2:(j+1)*f2]
-		resized[i,j] = np.max(slisse)
+	Y = img.shape[1]
+	dy = size[1] - (Y % size[1]) if (Y % size[1]) != 0 else 0
 
-	return resized
+	img = np.pad(img, ((0, dx),(0, dy)), 'constant')
+
+	fx = img.shape[0] // size[0]
+	fy = img.shape[1] // size[1]
+
+	res = block_reduce(img, (fx,fy), np.max)
+
+	return res
 
 def pipeline(img_name):
 	img = cv2.imread(img_name)
