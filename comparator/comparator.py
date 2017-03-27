@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+from skimage.measure import block_reduce
 from glob import glob
 from sys import argv
 from pprint import PrettyPrinter
@@ -24,15 +25,38 @@ def resize(img, shape=(64,64)):
 
 def pipeline(img_name):
 	img = cv2.imread(img_name)
+
 	gray_img = rgb2gray(img)
 
 	return resize(gray_img)
 
 def distance(img1, img2):
-	assert(img1.shape == img2.shape)
+	try:
+		assert(img1.shape == img2.shape)
+	except:
+		print(img1.shape)
+		print(img2.shape)
 
 	return np.sum(np.abs(img2 - img1))
 
+def compute_hashes(img_list):
+	hashes = {}
+
+	for img_name in img_list:
+		piped = pipeline(img_name)
+
+		hashes[img_name] = piped
+
+	return hashes
+
+def find_nn(target_name, candidates, hashes, size=10):
+	d = lambda i: distance(hashes[target_name], hashes[i])
+	distances = [d(i) for i in candidates]
+
+	results = list(zip(candidates, distances))
+	results.sort(key=lambda i: i[1])
+
+	return results[:size]
 
 if __name__ == "__main__":
 	if len(argv) < 3:
@@ -47,16 +71,8 @@ if __name__ == "__main__":
 	if target in candidates:
 		candidates.remove(target)
 
-	hashs = {}
-	for img_name in [target] + candidates:
-		piped = pipeline(img_name)
-
-		hashs[img_name] = piped
-
-	distances = [distance(hashs[target], hashs[i]) for i in candidates]
-
-	results = list(zip(candidates, distances))
-	results.sort(key=lambda i: i[1])
+	hashes = compute_hashes([target] + candidates)
+	results = find_nn(target, candidates, hashes)
 
 	pp = PrettyPrinter(indent=4)
 	pp.pprint(results)
