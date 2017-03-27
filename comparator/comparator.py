@@ -63,7 +63,7 @@ def find_nn(target_name, candidates, hashes, size=10):
 
 	return results[:size]
 
-if __name__ == "__main__":
+def parse_args(argv):
 	if len(argv) < 3:
 		print("Use: {} <target> <folder>".format(argv[0]))
 		exit(0)
@@ -75,6 +75,11 @@ if __name__ == "__main__":
 	candidates = [e for path in paths for e in glob(path)]
 	if target in candidates:
 		candidates.remove(target)
+
+	return target, candidates
+
+if __name__ == "__main__":
+	target, candidates = parse_args(argv)
 
 	hashes = compute_hashes([target] + candidates)
 	results = find_nn(target, candidates, hashes)
