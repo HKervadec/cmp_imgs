@@ -21,3 +21,10 @@ def parse_args():
 		candidates.remove(target)
 
 	return target, candidates
+
+def gen_features(img_name, function):
+	img = cv2.imread(img_name)
+
+	gray_img = rgb2gray(img)
+
+	return function(gray_img)

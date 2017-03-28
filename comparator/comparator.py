@@ -5,7 +5,7 @@ import cv2
 from skimage.measure import block_reduce
 from pprint import PrettyPrinter
 
-from common import rgb2gray, parse_args
+from common import parse_args, gen_features
 
 
 def resize(img, size=(64,64)):
@@ -24,19 +24,8 @@ def resize(img, size=(64,64)):
 
 	return res
 
-def pipeline(img_name):
-	img = cv2.imread(img_name)
-
-	gray_img = rgb2gray(img)
-
-	return resize(gray_img)
-
 def distance(img1, img2):
-	try:
-		assert(img1.shape == img2.shape)
-	except:
-		print(img1.shape)
-		print(img2.shape)
+	assert(img1.shape == img2.shape)
 
 	return np.sum(np.abs(img2 - img1))
 
@@ -44,7 +33,7 @@ def compute_hashes(img_list):
 	hashes = {}
 
 	for img_name in img_list:
-		piped = pipeline(img_name)
+		piped = gen_features(img_name, resize)
 
 		hashes[img_name] = piped
 
