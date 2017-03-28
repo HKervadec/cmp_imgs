@@ -4,8 +4,8 @@ import cv2
 from glob import glob
 from sys import argv
 
-def rgb2gray(img):
-	return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+# def rgb2gray(img):
+	# return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
 def parse_args():
 	if len(argv) < 3:
@@ -23,8 +23,9 @@ def parse_args():
 	return target, candidates
 
 def gen_features(img_name, function):
-	img = cv2.imread(img_name)
+	# img = cv2.imread(img_name)
+	# gray_img = rgb2gray(img)
 
-	gray_img = rgb2gray(img)
+	gray_img = cv2.imread(img_name,0)
 
 	return function(gray_img)
