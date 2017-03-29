@@ -32,17 +32,18 @@ class MainWindow(Gtk.Window):
         scrolled.add(flowbox)
 
         for image in neighbors:
-            img = self.image_preview(image)
+            img = self.image_preview(*image)
             flowbox.add(img)
 
         return scrolled
 
-    def image_preview(self, image_name):
+    def image_preview(self, image_name, image_score):
         box = Gtk.Box(orientation="vertical")
         image_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(image_name, width=200, height=120,
                                                 preserve_aspect_ratio=True)
         box.pack_start(Gtk.Image.new_from_pixbuf(image_pixbuf), True, True, 0)
         box.pack_start(Gtk.Label(image_name), True, True, 0)
+        box.pack_start(Gtk.Label(image_score), True, True, 0)
 
         return box
 
@@ -71,7 +72,7 @@ if __name__ == "__main__":
     results = engine.find_nn(target, candidates, features)
     print("NN: {}s".format(time() - t))
 
-    win = MainWindow(target, [e[0] for e in results])
+    win = MainWindow(target, results)
     win.connect("delete-event", Gtk.main_quit)
     win.show_all()
     Gtk.main()

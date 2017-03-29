@@ -30,15 +30,17 @@ It will display the results in the following way:
 * Support recursion in folders
 * Use a more robust framework for the script parameters
 * Find a way to use FLANN in a multi-process way for knn matching
-* Display score in GUI
 * Handle mirrored images
 * Tweak thresholds when matching features
+* Handle case for images without features
+* Save features in a file to speedup mutltiple searchs
 
 ### Done
 * Profile the script
 * Find a usable feature extractor to improve performances
 	* ORB is used at the moment.
 	* Started with SIFT, but really really slow during generation and matching.
+* Display score in GUI
 
 ### Dropped
 * Add option for the number of nearest neighbors we want to have

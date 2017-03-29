@@ -29,4 +29,4 @@ def gen_features(img_name, function):
 
 	resized_img = cv2.resize(gray_img, (x, y))
 
-	return function(resized_img)
+	return function(gray_img)
