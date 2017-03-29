@@ -1,18 +1,20 @@
 # Compare Images
-The goal of this project is to create a image comparator, to help find duplicates (but yet different bit-wise) images in a folder.
+The goal of this project is to create a image comparator, to help find duplicates and similar images in an image folder.
 
-At the moment, it finds the nearest neighbors to the target, according to the defined distance. Which is really basic and bad, by the way.
-It cannot tell by itself if the files are the same.
+At the moment, it is using the ORB feature extractor with a Ransac algorithm to detect similar images.
+It will output a sorted list of possible matches. The threshold is still fairly low during development, to maintain a high recall.
+
 
 ## Use
 ### Command line
 Just type
 ```bash
 ./comparator/comparator.py <target> <folder>
+./comparator/orb.py <target> <folder>
 ```
 `target` is the file we want to compare, and `folder` is where we want to look for duplicates. It is not recursive yet.
 
-It will then print a sorted list of the found images and the distance with the target. A distance of 0 is a perfect match.
+It will then print a sorted list of the matched images, with the best matching first. A higher score means a higher match.
 
 ### GUI to display results
 The syntax is similar
@@ -23,13 +25,20 @@ It will display the results in the following way:
 
 ![window](readme_imgs/app.png)
 
-## Todo
+## Todos and stuff
+### Todo
 * Support recursion in folders
-* Add an option to select how many NN we want to select
 * Use a more robust framework for the script parameters
-* Add option for the number of nearest neighbors we want to have
-* Find a usable feature extractor to improve performances
+* Find a way to use FLANN in a multi-process way for knn matching
+* Display score in GUI
+* Handle mirrored images
 
-## Done
+### Done
 * Profile the script
+* Find a usable feature extractor to improve performances
+	* ORB is used at the moment.
+	* Started with SIFT, but really really slow during generation and matching.
 
+### Dropped
+* Add option for the number of nearest neighbors we want to have
+	* The algorithm can now make a decision, so not useful anymore

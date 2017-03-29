@@ -4,9 +4,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GdkPixbuf
+from time import time
 
-from comparator import comparator
-from sys import argv
+from comparator import orb, common, comparator
 
 class MainWindow(Gtk.Window):
     def __init__(self, target, neighbors=[]):
@@ -59,10 +59,17 @@ class MainWindow(Gtk.Window):
 
 
 if __name__ == "__main__":
-    target, candidates = comparator.parse_args(argv)
+    t = time()
+    target, candidates = common.parse_args()
 
-    hashes = comparator.compute_hashes([target] + candidates)
-    results = comparator.find_nn(target, candidates, hashes)
+    engine = orb
+
+    features = engine.compute_features([target] + candidates)
+    print("Features: {}s".format(time() - t))
+    t = time()
+
+    results = engine.find_nn(target, candidates, features)
+    print("NN: {}s".format(time() - t))
 
     win = MainWindow(target, [e[0] for e in results])
     win.connect("delete-event", Gtk.main_quit)

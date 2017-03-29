@@ -2,16 +2,18 @@
 
 import cv2
 import numpy as np
-from pickle import dump, load
 from time import time
 from pprint import PrettyPrinter
 
-from common import *
+try:
+	from comparator.common import *
+except:
+	from common import *
 
 
-sift = cv2.xfeatures2d.SIFT_create()
+sift = cv2.ORB_create()
 sift_f = lambda e: sift.detectAndCompute(e, None) #return (kp, des)
-bf = cv2.BFMatcher()
+bf = cv2.BFMatcher(cv2.NORM_L1,crossCheck=False)
 
 
 def distance(features1, features2):
@@ -19,7 +21,18 @@ def distance(features1, features2):
 
 	good = [m for m,n in matches if (m.distance < 0.75*n.distance)]
 
-	return sum((m.distance for m in good))
+	if len(good) > 10:
+		kp1 = features1[0]
+		kp2 = features2[0]
+		src_pts = np.float32([kp1[m.queryIdx].pt for m in good]).reshape(-1,1,2)
+		dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1,1,2)
+
+		M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+
+		return len(mask)
+
+	return -1
+
 
 def compute_features(img_list, features=None):
 	if features == None:
@@ -38,35 +51,22 @@ def find_nn(target_name, candidates, features, size=10):
 	distances = [d(i) for i in candidates]
 
 	results = list(zip(candidates, distances))
-	results.sort(key=lambda i: i[1])
+	results = [e for e in results if e[1] != -1]
+	results.sort(key=lambda i: i[1], reverse=True)
 
-	return results[:size]
+	# return results[:size]
+	return results
 
 
 if __name__ == "__main__":
 	t = time()
 	target, candidates = parse_args()
 
-	savefile = "features.sift"
-	try:
-		with open(savefile, 'rb') as f:
-			features = load(f)
-			print("Loaded data from {}".format(savefile))
-	except:
-		print("No features file found")
-		features = None
-
 	features = compute_features([target] + candidates, features)
+	print(len(features[target][0]))
 
 	print(time() - t)
 	t = time()
-
-	# with open(savefile, 'wb') as f:
-	# 	print("Saving features to {}".format(savefile))
-	# 	dump(features, f)
-
-	# print(features[target][0])
-	# print(len(features[target][0]))
 
 	results = find_nn(target, candidates, features)
 	print(time() - t)

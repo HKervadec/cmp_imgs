@@ -5,7 +5,10 @@ import cv2
 from skimage.measure import block_reduce
 from pprint import PrettyPrinter
 
-from common import parse_args, gen_features
+try:
+	from comparator.common import *
+except:
+	from common import *
 
 
 def resize(img, size=(64,64)):
@@ -29,7 +32,7 @@ def distance(img1, img2):
 
 	return np.sum(np.abs(img2 - img1))
 
-def compute_hashes(img_list):
+def compute_features(img_list):
 	hashes = {}
 
 	for img_name in img_list:
@@ -52,7 +55,7 @@ def find_nn(target_name, candidates, hashes, size=10):
 if __name__ == "__main__":
 	target, candidates = parse_args()
 
-	hashes = compute_hashes([target] + candidates)
+	hashes = compute_features([target] + candidates)
 	results = find_nn(target, candidates, hashes)
 
 	pp = PrettyPrinter(indent=4)
