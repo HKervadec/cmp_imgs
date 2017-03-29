@@ -32,6 +32,7 @@ It will display the results in the following way:
 * Find a way to use FLANN in a multi-process way for knn matching
 * Display score in GUI
 * Handle mirrored images
+* Tweak thresholds when matching features
 
 ### Done
 * Profile the script

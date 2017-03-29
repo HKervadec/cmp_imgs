@@ -23,4 +23,10 @@ def parse_args():
 def gen_features(img_name, function):
 	gray_img = cv2.imread(img_name,0)
 
-	return function(gray_img)
+	r_factor = 1000 / max(gray_img.shape[0], gray_img.shape[1])
+	x = int(gray_img.shape[0] * r_factor)
+	y = int(gray_img.shape[1] * r_factor)
+
+	resized_img = cv2.resize(gray_img, (x, y))
+
+	return function(resized_img)

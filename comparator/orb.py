@@ -16,9 +16,11 @@ sift_f = lambda e: sift.detectAndCompute(e, None) #return (kp, des)
 bf = cv2.BFMatcher(cv2.NORM_L1,crossCheck=False)
 
 
-def distance(features1, features2):
-	matches = bf.knnMatch(features1[1], features2[1], k=2)
+def score(features1, features2):
+	if len(features1[1]) == 0 or len(features2[0]) == 0:
+		return -1
 
+	matches = bf.knnMatch(features1[1], features2[1], k=2)
 	good = [m for m,n in matches if (m.distance < 0.75*n.distance)]
 
 	if len(good) > 10:
@@ -33,7 +35,6 @@ def distance(features1, features2):
 
 	return -1
 
-
 def compute_features(img_list, features=None):
 	if features == None:
 		features = {}
@@ -46,15 +47,14 @@ def compute_features(img_list, features=None):
 
 	return features
 
-def find_nn(target_name, candidates, features, size=10):
-	d = lambda i: distance(features[target_name], features[i])
-	distances = [d(i) for i in candidates]
+def find_nn(target_name, candidates, features):
+	d = lambda i: score(features[target_name], features[i])
+	scores = [d(i) for i in candidates]
 
-	results = list(zip(candidates, distances))
+	results = list(zip(candidates, scores))
 	results = [e for e in results if e[1] != -1]
 	results.sort(key=lambda i: i[1], reverse=True)
 
-	# return results[:size]
 	return results
 
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
 	t = time()
 	target, candidates = parse_args()
 
-	features = compute_features([target] + candidates, features)
+	features = compute_features([target] + candidates)
 	print(len(features[target][0]))
 
 	print(time() - t)
